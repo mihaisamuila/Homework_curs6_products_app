@@ -7,9 +7,8 @@ import com.fasttrackit.curs6_homework.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/products")
@@ -18,36 +17,9 @@ public class ProductController {
     private final ProductService service;
 
     @GetMapping
-    List<Product> getProduct() {
-        return service.getAll();
-    }
-
-    @GetMapping("category/{categoryName}")
-    List<Product> getProductByCategory(@PathVariable String categoryName) {
-        List<Product> allProducts = service.getAll();
-
-        List<Product> productsByCatergory = allProducts
-                .stream()
-                .filter(c -> c.getCategory().getName().equals(categoryName))
-                .collect(Collectors.toList());
-        return productsByCatergory;
-    }
-
-    @GetMapping("maxprice")
-    List<Product> getMaxPriceProduct() {
-        List<Product> allProducts = service.getAll();
-
-        long productMaxPrice = allProducts.stream()
-                .max(Comparator.comparingLong(Product::getPrice))
-                .get()
-                .getPrice();
-
-        List<Product> maxPriceProducts = allProducts
-                .stream()
-                .filter(m -> m.getPrice() == productMaxPrice)
-                .collect(Collectors.toList());
-
-        return maxPriceProducts;
+    List<Product> getProducts(@RequestParam(name = "category", required = false, defaultValue = "no_value") String categoryName,
+                              @RequestParam(name = "maxprice", required = false, defaultValue = "false") boolean maxprice) {
+        return service.getAll(categoryName, maxprice);
     }
 
     @GetMapping("{productId}")
